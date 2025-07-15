@@ -32,11 +32,4 @@ def download_data(ticker : str, start_date: str, end_date:str, save_path:str):
         return None
 
 
-    # data.to_csv(save_path) #change data into a csv file 
-    # print(f"Data for {ticker} successfully saved to {save_path}")
-    # return data #
-    # except Exception as e:
-    #     print(f"An error occurred while downloading data for {ticker}: {e}")
-    #     return None
-
 
