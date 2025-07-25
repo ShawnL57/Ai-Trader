@@ -20,7 +20,7 @@ def load_data(file_path_tickers:str, start_date:str, end_date:str, save_path:str
     """
 
     
-    try:
+    try: 
         with open(file_path_tickers, 'r') as file:  #open the file and read tickers
             tickers = []
             for line in file:
