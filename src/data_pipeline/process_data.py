@@ -89,6 +89,13 @@ def process_data(raw_data_path: str, processed_data_path: str)-> pd.DataFrame:
     for ticker, group in raw_df.groupby('Ticker'):
         print(f"--- Processing ticker: {ticker} ---")
 
+        # --- Data Sufficiency Check ---
+        # Skip tickers with too few data points to calculate indicators reliably.
+        # 50 is a safe buffer for the longest default indicator (SMA_50).
+        if len(group) < 50:
+            print(f"Skipping {ticker}: not enough data points ({len(group)}) for feature calculation.")
+            continue
+
         last_date = last_dates.get(ticker) 
         if last_date:
             # For incremental runs, we need a buffer of old data to correctly calculate indicators
