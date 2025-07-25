@@ -1,6 +1,7 @@
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
 import os
+import numpy as np
 
 def process_data(raw_data_path: str, processed_data_path: str):
     """
@@ -12,8 +13,8 @@ def process_data(raw_data_path: str, processed_data_path: str):
     if the raw data file is not found, return None. 
 
 
-        raw_data_path: str, path to csv file that contains the raw data
-        processed_data_path: str, to path to csv that contains processed data
+        raw_data_path: str, path to csv file that contains the raw data  
+        processed_data_path: str, to path to csv that contains processed data   
 
     Function: 
         -Reads the raw data from teh csv file : raw_data_path
@@ -44,7 +45,14 @@ def process_data(raw_data_path: str, processed_data_path: str):
         processed_group['Date'] = pd.to_datetime(processed_group['Date'])
         processed_group.set_index('Date', inplace=True)
 
-        #front fill missing values, drop any remaining missing values
+        # --- Feature Engineering ---
+        # Create features that might introduce NaNs
+        processed_group['SMA_20'] = processed_group['Close'].rolling(window=20).mean()
+        processed_group['Lag_Return_1'] = processed_group['Close'].pct_change(1).shift(1)
+        processed_group['Log_Return'] = np.log(processed_group['Close'] / processed_group['Close'].shift(1))
+
+        # --- Data Cleaning ---
+        # Forward-fill to handle intermittent NaNs, then drop any remaining NaNs (like at the start)
         processed_group.ffill(inplace=True)
         processed_group.dropna(inplace=True)
         
@@ -52,24 +60,31 @@ def process_data(raw_data_path: str, processed_data_path: str):
         if processed_group.empty:
             print(f"Skipping {ticker} due to no data after cleaning.")
             continue
-        #normalize columns:
-        scaler = MinMaxScaler()
-        columns_to_normalize = ["Open", "High", "Low", "Close","Adj Close","Volume"]
 
-        #remove columns that don't exist in the group
-        i = 0
-        while i < len(columns_to_normalize):
-            if columns_to_normalize[i] not in processed_group.columns:
-                columns_to_normalize.pop(i)
-            else:
-                i+=1
+        # --- Target Variable ---
+        # y=1 if next day's return is positive, else 0. Drop last row where y is NaN.
+        processed_group['y'] = (processed_group['Close'].shift(-1) > processed_group['Close']).astype(int)
+        processed_group.dropna(inplace=True)
+
+        # --- Normalization ---
+        scaler = MinMaxScaler()
+        columns_to_normalize = ["Open", "High", "Low", "Close","Adj Close","Volume", "SMA_20", "Lag_Return_1", "Log_Return"]
+
+        # Remove columns that don't exist in the group
+        # (This is good practice in case some tickers lack certain data)
+        valid_columns_to_normalize = [col for col in columns_to_normalize if col in processed_group.columns]
         
-        #now only normalize the columns that exist in the group
-        if not columns_to_normalize:
+        # Now only normalize the columns that exist in the group
+        if not valid_columns_to_normalize:
             print(f"No valid columns to normalize for {ticker}")
             continue
-        processed_group[columns_to_normalize] = scaler.fit_transform(processed_group[columns_to_normalize])
+        
+        processed_group[valid_columns_to_normalize] = scaler.fit_transform(processed_group[valid_columns_to_normalize])
         all_processed_data.append(processed_group)
+
+    if not all_processed_data:
+        print("No data was processed.")
+        return None
 
     final_df = pd.concat(all_processed_data)
     os.makedirs(os.path.dirname(processed_data_path), exist_ok=True)
