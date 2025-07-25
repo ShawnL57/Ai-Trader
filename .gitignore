@@ -1,2 +1,3 @@
 *.csv
 src/test_pipeline/
+__pycahce__/
