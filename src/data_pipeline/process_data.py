@@ -44,7 +44,16 @@ def process_data(raw_data_path: str, processed_data_path: str)-> pd.DataFrame:
     print("Loading raw data...")
     raw_df = pd.read_csv(raw_data_path, parse_dates=['Date'])
 
-    # --- Data Validation ---
+    # --- Data Validation & Cleaning ---
+    # Convert core columns to numeric, coercing errors to NaN. This handles any non-numeric
+    # values (e.g., error strings) that might have been saved in the raw CSV.
+    for col in ['Open', 'High', 'Low', 'Close', 'Volume']:
+        if col in raw_df.columns:
+            raw_df[col] = pd.to_numeric(raw_df[col], errors='coerce')
+    
+    # Drop rows where essential data is missing (e.g., after coercion)
+    raw_df.dropna(subset=['Close', 'Volume'], inplace=True)
+
     if raw_df.duplicated(subset=['Ticker', 'Date']).any():
         print("Warning: Found duplicate Ticker-Date rows. Keeping the last entry for each.")
         raw_df.drop_duplicates(subset=['Ticker', 'Date'], keep='last', inplace=True)
@@ -195,3 +204,5 @@ def process_data(raw_data_path: str, processed_data_path: str)-> pd.DataFrame:
 
     print("\nProcessing complete.")
     return new_df
+if __name__ == "__main__":
+    process_data(raw_data_path="Data/raw_data.csv", processed_data_path="Data/processed_data.csv")

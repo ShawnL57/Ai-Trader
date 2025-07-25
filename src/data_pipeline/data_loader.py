@@ -2,7 +2,7 @@
 import pandas as pd
 import os
 from typing import List, Optional
-from fetch_data import download_data
+from .fetch_data import download_data
 
 def load_data(file_path_tickers:str, start_date:str, end_date:str, save_path:str):
     """
