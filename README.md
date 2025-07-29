@@ -39,7 +39,7 @@ Ai-Trader/
 Clone the repository and install the required packages:
 
 ```bash
-git clone <repository-url>
+git clone <https://github.com/shawnl57/ai-trader>
 cd Ai-Trader
 pip install -r requirements.txt
 ```
