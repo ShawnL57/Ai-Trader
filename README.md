@@ -1,59 +1,97 @@
-# Ai-Trader
+# AI Trader
 
-Ai Trader, Created by Shawn Lin
+This project is an algorithmic trading system that uses machine learning to predict stock price movements. It includes a data pipeline for fetching, processing, and splitting financial data, and a training script to build a predictive model.
 
-A brief description of your project.
+## Project Structure
 
-## About The Project
-
-TODO: Write about your project here.
+```
+Ai-Trader/
+├── data/
+│   ├── Processed/
+│   │   ├── processed_data.csv
+│   │   ├── scaler.joblib
+│   │   ├── train_data.csv
+│   │   └── test_data.csv
+│   └── Raw/
+│       └── raw_data.csv
+├── src/
+│   ├── data_pipeline/
+│   │   ├── fetch_data.py
+│   │   ├── populate_data.py
+│   │   ├── process_data.py
+│   │   └── nasdaq_tickers.txt
+│   └── train/
+│       ├── split_data.py
+│       └── train.py
+├── requirements.txt
+└── README.md
+```
 
 ## Getting Started
 
-To get a local copy up and running follow these simple example steps.
+### 1. Prerequisites
 
-### Prerequisites
+- Python 3.8 or higher
+- Pip
 
-This is an example of how to list things you need to use the software and how to install them.
-* npm
-  ```
-  npm install npm@latest -g
-  ```
+### 2. Installation
 
-### Installation
+Clone the repository and install the required packages:
 
-1. Clone the repo
-   ```sh
-   git clone https://github.com/your_username/Ai-Trader.git
-   ```
-2. Install NPM packages
-   ```sh
-   npm install
-   ```
+```bash
+git clone <repository-url>
+cd Ai-Trader
+pip install -r requirements.txt
+```
 
 ## Usage
 
-Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos work well in this space. You may also link to more resources.
+The project is designed to be run as a sequence of steps.
 
-## Contributing
+### Step 1: Populate the Data
 
-Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
+This step fetches raw financial data, processes it by adding technical indicators, and saves the result.
 
-If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
-Don't forget to give the project a star! Thanks again!
+```bash
+python3 src/data_pipeline/populate_data.py
+```
 
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+This script will:
+1.  Read the ticker symbols from `src/data_pipeline/nasdaq_tickers.txt`.
+2.  Download historical data for each ticker into `data/Raw/raw_data.csv`.
+3.  Process the raw data, calculate features, and save the result to `data/Processed/processed_data.csv`.
+4.  Save the feature scaler to `data/Processed/scaler.joblib`.
 
-## License
+### Step 2: Split the Data
 
-Distributed under the MIT License. See `LICENSE` for more information.
+This step splits the processed data into training and testing sets for model training.
 
-## Contact
+```bash
+python3 src/train/split_data.py
+```
 
-Your Name - [@your_twitter](https://twitter.com/your_twitter) - email@example.com
+This will create `train_data.csv` and `test_data.csv` in the `data/Processed/` directory, using a time-series-aware split (75% for training, 25% for testing).
 
-Project Link: [https://github.com/your_username/Ai-Trader](https://github.com/your_username/Ai-Trader) 
+### Step 3: Train the Model
+
+Once the data is split, you can run the training script:
+
+```bash
+python3 src/train/train.py
+```
+
+This will load the training data, train a model, and (eventually) save the trained model for future use. (Note: `train.py` is currently a placeholder).
+
+## Data Pipeline Explained
+
+1.  **`populate_data.py`**: The main script to orchestrate data fetching and processing.
+2.  **`fetch_data.py`**: Uses `yfinance` to download data for a list of tickers.
+3.  **`process_data.py`**:
+    -   Cleans the raw data.
+    -   Engineers features by calculating technical indicators (RSI, SMA, EMA, MACD, etc.).
+    -   Creates a binary target variable `y` (1 if the next day's close is higher, 0 otherwise).
+    -   Scales the features using `StandardScaler`.
+    -   Supports incremental updates to the processed data.
+4.  **`split_data.py`**:
+    -   Loads the processed data.
+    -   Uses `sklearn.model_selection.TimeSeriesSplit` to ensure that the training data always comes before the testing data, which is crucial for financial time-series models. 
