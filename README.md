@@ -1,11 +1,11 @@
-# AI Trader
+# Financial-Prediction-Pipeline
 
 This project is an end-to-end algorithmic trading system that uses machine learning to predict daily stock price movements. It includes a complete data pipeline for fetching, processing, and splitting financial data, and a training pipeline to build, tune, and evaluate a predictive model.
 
 ## Project Structure
 
 ```
-Ai-Trader/
+Financial-Prediction-Pipeline/
 ├── data/
 │   ├── Processed/
 │   │   ├── processed_data.csv
@@ -40,8 +40,8 @@ Ai-Trader/
 Clone the repository and install the required packages. The `requirements.txt` file includes a pinned version of `xgboost` to ensure reproducibility.
 
 ```bash
-git clone https://github.com/shawnl57/ai-trader
-cd Ai-Trader
+git clone https://github.com/shawnl57/Financial-Prediction-Pipeline
+cd Financial-Prediction-Pipeline
 pip install -r requirements.txt
 ```
 
