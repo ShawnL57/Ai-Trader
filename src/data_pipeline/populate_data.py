@@ -43,10 +43,10 @@ def call_populate_data(tickers_file_path: str, raw_data_path: str, processed_dat
     return populate_data(tickers_file_path, raw_data_path, processed_data_path, start_date, end_date)
 if __name__ == "__main__":
     # Define paths and parameters for the script
-    TICKERS_FILE = 'src/data_pipeline/nasdaq_tickers.txt'
+    TICKERS_FILE = 'src/data_pipeline/nasdaq_tickers.txt' 
     RAW_DATA_PATH = 'data/Raw/raw_data.csv'
     PROCESSED_DATA_PATH = 'data/Processed/processed_data.csv'
-    START_DATE = '2020-01-01'
+    START_DATE = '2020-01-01' 
     END_DATE = '2023-01-01'
 
     # Ensure the output directories exist
