@@ -4,3 +4,4 @@ scikit-learn
 yfinance 
 pandas-ta 
 joblib
+xgboost==2.0.3
