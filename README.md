@@ -41,7 +41,7 @@ Clone the repository and install the required packages. The `requirements.txt` f
 
 ```bash
 git clone https://github.com/shawnl57/Financial-Prediction-Pipeline
-cd Financial-Prediction-Pipeline
+cd ai-trader
 pip install -r requirements.txt
 ```
 
